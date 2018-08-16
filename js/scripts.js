@@ -27,6 +27,8 @@ $('.modal-container').hide();
                         COMPONENTS
 ===============-=============-=============-===========*/
 
+// -- EMPLOYEE COMPONENT -- //
+
 const createEmployee = data => {
   const { name, email, cell, picture, location, nat, dob } = data;
   return {
@@ -43,6 +45,8 @@ const createEmployee = data => {
     birthday: formatDate(dob.date)
   }
 }
+
+// -- DIRECTORY COMPONENT -- //
 
 class Directory {
   constructor() {
@@ -83,8 +87,9 @@ class Directory {
     });
     this.$gallery.append(html);
   }
-
 }
+
+// -- MODAL COMPONENT -- //
 
 class Modal {
   constructor(employees) {
@@ -92,20 +97,21 @@ class Modal {
     this.$body = $('body');
     this.$cards = $('.card');
     this.$modalCloseBtn = $('#modal-close-btn');
+    this.$modalNavButtons = $('.modal-btn-container button');
     this.employees = employees;
+    this.currentEmployeeIndex = 0;
 
     this.$cards.on('click', e => this.showModal(e));
     this.$modalCloseBtn.on('click', () => this.hideModal());
+    this.$modalNavButtons.on('click', e => this.navigateModal(e));
   }
 
   showModal(e) {
     const $selectedCard = $(e.target).closest('.card');
-    this.$modal.show();
-    this.$cards.removeClass('active');
-    $selectedCard.addClass('active');
-    const currentEmployeeIndex = $selectedCard.index();
-    const currentEmployee = this.employees[currentEmployeeIndex];
+    this.currentEmployeeIndex = $selectedCard.index();
+    const currentEmployee = this.employees[this.currentEmployeeIndex];
     this.populateModal(currentEmployee);
+    this.$modal.show();
   }
 
   hideModal() {
@@ -125,6 +131,28 @@ class Modal {
     $('.modal-address').html(address);
     $('.modal-country').text(country);
     $('.modal-birthday').text(`Birthday: ${birthday}`);
+  }
+
+  navigateModal(e) {
+    const lastIndex = this.employees.length - 1;
+    
+    if(e.target.textContent === 'Prev') {
+      if (this.currentEmployeeIndex === 0) {
+        this.currentEmployeeIndex = lastIndex;
+      } else {
+        this.currentEmployeeIndex--;
+      }
+      const prevEmployee = this.employees[this.currentEmployeeIndex];
+      this.populateModal(prevEmployee);
+    } else if(e.target.textContent === 'Next') {
+      if (this.currentEmployeeIndex === lastIndex) {
+        this.currentEmployeeIndex = 0;
+      } else {
+        this.currentEmployeeIndex++;
+      }
+      const nextEmployee = this.employees[this.currentEmployeeIndex];
+      this.populateModal(nextEmployee);
+    }
   }
 }
 
