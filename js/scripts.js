@@ -26,6 +26,23 @@ $('.modal-container').hide();
                         COMPONENTS
 ===============-=============-=============-===========*/
 
+const createEmployee = data => {
+  const { name, email, login, cell, picture, location, nat, dob } = data;
+  return {
+    name: `${name.first} ${name.last}`,
+    email,
+    username: login.username,
+    cell,
+    image: picture.large,
+    street: location.street,
+    city: location.city,
+    state: location.state,
+    postcode: location.postcode,
+    country: abbreviateCountry(nat),
+    birthday: formatDate(dob.date)
+  }
+}
+
 class Directory {
   constructor() {
     this.employees = [];
@@ -37,11 +54,11 @@ class Directory {
         .then(res => res.json())
         .then(data => data.results)
         .then(employeesData => {
-          return employeesData.map(employeeData => new Employee(employeeData));
+          return employeesData.map(employeeData => createEmployee(employeeData));
         })
         .then(employeesArray => {
           this.populateEmployees(employeesArray);
-          this.employees.push(employeesArray);
+          employeesArray.map(employee => this.employees.push(employee));
         });
   }
 
@@ -62,22 +79,6 @@ class Directory {
     this.$gallery.append(html);
   }
 
-}
-
-class Employee {
-  constructor(data) {
-    this.name = `${data.name.first} ${data.name.last}`;
-    this.email = data.email;
-    this.username = data.login.username;
-    this.cell = data.cell;
-    this.image = data.picture.large;
-    this.street = data.location.street;
-    this.city = data.location.city;
-    this.state = data.location.state;
-    this.postcode = data.location.postcode;
-    this.country = abbreviateCountry(data.nat);
-    this.birthday = formatDate(data.dob.date);
-  }
 }
 
 /*=============-=============-=============-=============
