@@ -3,14 +3,14 @@ $('#gallery').after(
     <div class="modal">
         <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
         <div class="modal-info-container">
-            <img class="modal-img" src="https://placehold.it/125x125" alt="profile picture">
-            <h3 id="name" class="modal-name cap">name</h3>
-            <p class="modal-text">email</p>
-            <p class="modal-text cap">city</p>
+            <img class="modal-img" src="" alt="">
+            <h3 id="name" class="modal-name cap"></h3>
+            <p class="modal-text modal-email"></p>
+            <p class="modal-text cap modal-city"></p>
             <hr>
-            <p class="modal-text">(555) 555-5555</p>
-            <p class="modal-text">123 Portland Ave., Portland, OR 97204</p>
-            <p class="modal-text">Birthday: 10/21/2015</p>
+            <p class="modal-text modal-cell"></p>
+            <p class="modal-text modal-address"></p>
+            <p class="modal-text modal-birthday"></p>
         </div>
     </div>
     <div class="modal-btn-container">
@@ -27,11 +27,10 @@ $('.modal-container').hide();
 ===============-=============-=============-===========*/
 
 const createEmployee = data => {
-  const { name, email, login, cell, picture, location, nat, dob } = data;
+  const { name, email, cell, picture, location, nat, dob } = data;
   return {
     name: `${name.first} ${name.last}`,
     email,
-    username: login.username,
     cell,
     image: picture.large,
     street: location.street,
@@ -47,6 +46,8 @@ class Directory {
   constructor() {
     this.employees = [];
     this.$gallery = $('#gallery');
+    this.$cards = $('#gallery .card');
+    this.modal = null;
   };
 
   fetchData(num) {
@@ -58,7 +59,9 @@ class Directory {
         })
         .then(employeesArray => {
           this.populateEmployees(employeesArray);
+          this.$cards = $('.cards');
           employeesArray.map(employee => this.employees.push(employee));
+          this.modal = new Modal(this.employees);
         });
   }
 
@@ -79,6 +82,47 @@ class Directory {
     this.$gallery.append(html);
   }
 
+}
+
+class Modal {
+  constructor(employees) {
+    this.$modal = $('.modal-container');
+    this.$body = $('body');
+    this.$cards = $('.card');
+    this.$modalCloseBtn = $('#modal-close-btn');
+    this.employees = employees;
+
+    this.$cards.on('click', e => this.showModal(e));
+    this.$modalCloseBtn.on('click', () => this.hideModal());
+  }
+
+  showModal(e) {
+    const $selectedCard = $(e.target).closest('.card');
+    this.$modal.show();
+    this.$cards.removeClass('active');
+    $selectedCard.addClass('active');
+    const currentEmployeeIndex = $selectedCard.index();
+    const currentEmployee = this.employees[currentEmployeeIndex];
+    this.populateModal(currentEmployee);
+  }
+
+  hideModal() {
+    this.$modal.hide();
+  }
+
+  populateModal(employee) {
+    const {image, name, email, city, cell, birthday} = employee;
+    const {street, state, postcode} = employee;
+    const address = `${street}, ${state} ${postcode}`;
+
+    $('.modal-img').attr('src', image);
+    $('.modal-name').text(name);
+    $('.modal-email').text(email);
+    $('.modal-city').text(city);
+    $('.modal-cell').text(cell);
+    $('.modal-address').text(address);
+    $('.modal-birthday').text(birthday);
+  }
 }
 
 /*=============-=============-=============-=============
