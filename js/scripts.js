@@ -22,18 +22,9 @@ $('#gallery').after(
 
 $('.modal-container').hide();
 
-// $('#gallery').append(
-//   `<div class="card">
-//     <div class="card-img-container">
-//         <img class="card-img" src="https://placehold.it/90x90" alt="profile picture">
-//     </div>
-//     <div class="card-info-container">
-//         <h3 id="name" class="card-name cap">first last</h3>
-//         <p class="card-text">email</p>
-//         <p class="card-text cap">city, state</p>
-//     </div>
-//   </div>`
-// );
+/*=============-=============-=============-=============
+                        COMPONENTS
+===============-=============-=============-===========*/
 
 class Directory {
   constructor() {
@@ -45,8 +36,8 @@ class Directory {
     fetch(`https://randomuser.me/api/?nat=us,gb,ca,ie,au&results=${num}&noinfo`)
         .then(res => res.json())
         .then(data => data.results)
-        .then(employees => {
-          return employees.map(employee => new Employee(employee));
+        .then(employeesData => {
+          return employeesData.map(employeeData => new Employee(employeeData));
         })
         .then(employeesArray => {
           this.populateEmployees(employeesArray);
@@ -77,11 +68,49 @@ class Employee {
   constructor(data) {
     this.name = `${data.name.first} ${data.name.last}`;
     this.email = data.email;
+    this.username = data.login.username;
+    this.cell = data.cell;
     this.image = data.picture.large;
+    this.street = data.location.street;
     this.city = data.location.city;
     this.state = data.location.state;
+    this.postcode = data.location.postcode;
+    this.country = abbreviateCountry(data.nat);
+    this.birthday = formatDate(data.dob.date);
   }
 }
+
+/*=============-=============-=============-=============
+                        FUNCTIONS
+===============-=============-=============-===========*/
+
+function formatDate(date) {
+  const d = new Date(date);
+  const year = d.getFullYear();
+  let month = d.getMonth() + 1;
+  let day = d.getDate();
+
+  day < 10 ? day = `0${day}` : day;
+  month < 10 ? month = `0${month}` : month;
+
+  return `${month}/${day}/${year}`;
+}
+
+function abbreviateCountry(countryCode) {
+  const countryAbbr = {
+    AU: 'Australia',
+    CA: 'Canada',
+    GB: 'United Kingdom',
+    IE: 'Ireland',
+    US: 'United States'
+  }
+
+  return countryAbbr[countryCode];
+}
+
+/*=============-=============-=============-=============
+                      PROGRAM INIT
+===============-=============-=============-===========*/
 
 const directory = new Directory();
 directory.fetchData(12);
