@@ -9,7 +9,8 @@ $('#gallery').after(
             <p class="modal-text cap modal-city"></p>
             <hr>
             <p class="modal-text modal-cell"></p>
-            <p class="modal-text modal-address"></p>
+            <p class="modal-text modal-address cap"></p>
+            <p class="modal-text modal-country"></p>
             <p class="modal-text modal-birthday"></p>
         </div>
     </div>
@@ -37,7 +38,8 @@ const createEmployee = data => {
     city: location.city,
     state: location.state,
     postcode: location.postcode,
-    country: abbreviateCountry(nat),
+    country: unAbbreviateCountry(nat),
+    countryCode: nat,
     birthday: formatDate(dob.date)
   }
 }
@@ -51,7 +53,7 @@ class Directory {
   };
 
   fetchData(num) {
-    fetch(`https://randomuser.me/api/?nat=us,gb,ca,ie,au&results=${num}&noinfo`)
+    fetch(`https://randomuser.me/api/?nat=us,ca,au&results=${num}&noinfo`)
         .then(res => res.json())
         .then(data => data.results)
         .then(employeesData => {
@@ -75,7 +77,7 @@ class Directory {
                 <div class="card-info-container">
                     <h3 id="name" class="card-name cap">${name}</h3>
                     <p class="card-text">${email}</p>
-                    <p class="card-text cap">${city}, ${state}</p>
+                    <p class="card-text cap">${city}</p>
                 </div>
               </div>`;
     });
@@ -112,16 +114,17 @@ class Modal {
 
   populateModal(employee) {
     const {image, name, email, city, cell, birthday} = employee;
-    const {street, state, postcode} = employee;
-    const address = `${street}, ${state} ${postcode}`;
+    const {street, state, postcode, country, countryCode} = employee;
+    const address = `${street}, ${abbreviateState(state, countryCode)} ${postcode}`;
 
     $('.modal-img').attr('src', image);
     $('.modal-name').text(name);
     $('.modal-email').text(email);
     $('.modal-city').text(city);
     $('.modal-cell').text(cell);
-    $('.modal-address').text(address);
-    $('.modal-birthday').text(birthday);
+    $('.modal-address').html(address);
+    $('.modal-country').text(country);
+    $('.modal-birthday').text(`Birthday: ${birthday}`);
   }
 }
 
@@ -141,16 +144,112 @@ function formatDate(date) {
   return `${month}/${day}/${year}`;
 }
 
-function abbreviateCountry(countryCode) {
+function capitalize(str) {
+  return str.split(' ').map( item => item.slice(0,1).toUpperCase() + item.substring(1)).join(' ');
+}
+
+function unAbbreviateCountry(countryCode) {
   const countryAbbr = {
     AU: 'Australia',
     CA: 'Canada',
-    GB: 'United Kingdom',
-    IE: 'Ireland',
     US: 'United States'
   }
 
   return countryAbbr[countryCode];
+}
+
+function abbreviateState(state, countryCode) {
+
+  const statesAbbr = {
+    AU: {
+        "Australian Capital Territory": "ACT",
+        "Northern Territory": "NT",
+        "New South Wales": "NSW",
+        Queensland: "QLD",
+        "South Australia": "SA",
+        Tasmania: "TAS",
+        Victoria: "VIC",
+        "Western Australia": "WA"
+    },
+    CA: {
+        Alberta: "AB",
+        "British Columbia": "BC",
+        Manitoba: "MB",
+        "New Brunswick": "NB",
+        "Newfoundland And Labrador": "NL",
+        "Northwest Territories": "NT",
+        "Nova Scotia": "NS",
+        Nunavut: "NU",
+        Ontario: "ON",
+        "Prince Edward Island": "PE",
+        Québec: "QC",
+        Saskatchewan: "SK",
+        "Yukon Territory": "YT"
+    },
+    US: {
+        Alabama: "AL",
+        Alaska: "AK",
+        "American Samoa": "AS",
+        Arizona: "AZ",
+        Arkansas: "AR",
+        California: "CA",
+        Colorado: "CO",
+        Connecticut: "CT",
+        Delaware: "DE",
+        "District Of Columbia": "DC",
+        "Federated States Of Micronesia": "FM",
+        Florida: "FL",
+        Georgia: "GA",
+        Guam: "GU",
+        Hawaii: "HI",
+        Idaho: "ID",
+        Illinois: "IL",
+        Indiana: "IN",
+        Iowa: "IA",
+        Kansas: "KS",
+        Kentucky: "KY",
+        Louisiana: "LA",
+        Maine: "ME",
+        "Marshall Islands": "MH",
+        Maryland: "MD",
+        Massachusetts: "MA",
+        Michigan: "MI",
+        Minnesota: "MN",
+        Mississippi: "MS",
+        Missouri: "MO",
+        Montana: "MT",
+        Nebraska: "NE",
+        Nevada: "NV",
+        "New Hampshire": "NH",
+        "New Jersey": "NJ",
+        "New Mexico": "NM",
+        "New York": "NY",
+        "North Carolina": "NC",
+        "North Dakota": "ND",
+        "Northern Mariana Islands": "MP",
+        Ohio: "OH",
+        Oklahoma: "OK",
+        Oregon: "OR",
+        Palau: "PW",
+        Pennsylvania: "PA",
+        "Puerto Rico": "PR",
+        "Rhode Island": "RI",
+        "South Carolina": "SC",
+        "South Dakota": "SD",
+        Tennessee: "TN",
+        Texas: "TX",
+        Utah: "UT",
+        Vermont: "VT",
+        "Virgin Islands": "VI",
+        Virginia: "VA",
+        Washington: "WA",
+        "West Virginia": "WV",
+        Wisconsin: "WI",
+        Wyoming: "WY"
+    }
+  }
+
+  return statesAbbr[countryCode][capitalize(state)];
 }
 
 /*=============-=============-=============-=============
