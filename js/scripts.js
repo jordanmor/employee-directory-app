@@ -25,7 +25,7 @@ $('.search-container').append(
   `<form action="#" method="get">
     <input type="search" id="search-input" class="search-input" placeholder="Search...">
     <input type="submit" value="&#x1F50D;" id="search-submit" class="search-submit">
-    <button class="full-list-btn">Full List</button>
+    <button class="full-list-btn is-hidden">Return to Full List</button>
   </form>`);
 
 /*=============-=============-=============-=============
@@ -60,11 +60,14 @@ class Directory {
     this.$cards = $('#gallery .card');
     this.$modalContainer = $('.modal-container');
     this.modal = null;
-    this.search = new Search();
+    this.$searchInput = $('#search-input');
+    this.searchButtons = new SearchButtons();
+
+    this.searchButtons.$submitBtn.on('click', () => this.performSearch());
+    this.searchButtons.$fullListBtn.on('click', () => this.returnFullList());
   };
 
   init(numOfEmployees) {
-    this.search.$fullListBtn.hide();
     this.$modalContainer.hide();
     this.fetchData(numOfEmployees);
   }
@@ -99,6 +102,34 @@ class Directory {
               </div>`;
     });
     this.$gallery.append(html);
+  }
+
+  performSearch() {
+    const value = this.$searchInput.val().toLowerCase().trim();
+    const filteredList = filterList(this.employees, value);
+
+    if(value !== '') {
+      this.$searchInput.val('');
+      this.$searchInput.hide();
+
+      if(!filteredList.length) {
+        this.$gallery.html('<h2>There are no employees that match that search criteria</h2>');
+      } else {
+        this.$gallery.html('');
+        this.populateEmployees(filteredList);
+        this.modal = new Modal(filteredList);
+      }
+      
+      this.searchButtons.showFullListBtn();
+    }
+  }
+
+  returnFullList() {
+    this.$gallery.html('');
+    this.populateEmployees(this.employees);
+    this.modal = new Modal(this.employees);
+    this.$searchInput.show();
+    this.searchButtons.showSubmitBtn();
   }
 }
 
@@ -171,33 +202,30 @@ class Modal {
 
 // -- SEARCH COMPONENT -- //
 
-class Search {
-  constructor(employees) {
-    this.employees = employees;
+class SearchButtons {
+  constructor() {
     this.$fullListBtn = $('.full-list-btn');
-    this.$searchInput = $('#search-input');
-    this.$searchSubmitBtn = $('#search-submit');
-   
-    this.$searchSubmitBtn.on('click', () => this.searchSubmit());
-    this.$fullListBtn.on('click', () => this.returnFullList());
+    this.$submitBtn = $('#search-submit');
   }
 
-  searchSubmit() {
-    this.$searchSubmitBtn.hide();
-    this.$fullListBtn.show();
+  showSubmitBtn() {
+    this.$fullListBtn.addClass('is-hidden');
+    this.$submitBtn.show();
   }
 
-  returnFullList() {
-    this.$fullListBtn.hide(); 
-    this.$searchSubmitBtn.show();
+  showFullListBtn() {
+    this.$submitBtn.hide();
+    this.$fullListBtn.removeClass('is-hidden');
   }
-
-
 }
 
 /*=============-=============-=============-=============
                         FUNCTIONS
 ===============-=============-=============-===========*/
+
+function filterList(employees, value) {
+  return employees.filter(employee => employee.name.includes(value));
+}
 
 function formatDate(date) {
   const d = new Date(date);
