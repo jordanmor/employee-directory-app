@@ -24,7 +24,8 @@ $('#gallery').after(
 $('.search-container').append(
   `<form action="#" method="get">
     <input type="search" id="search-input" class="search-input" placeholder="Search...">
-    <input type="submit" value="&#x1F50D;" id="serach-submit" class="search-submit">
+    <input type="submit" value="&#x1F50D;" id="search-submit" class="search-submit">
+    <button class="full-list-btn">Full List</button>
   </form>`);
 
 /*=============-=============-=============-=============
@@ -59,9 +60,11 @@ class Directory {
     this.$cards = $('#gallery .card');
     this.$modalContainer = $('.modal-container');
     this.modal = null;
+    this.search = new Search();
   };
 
   init(numOfEmployees) {
+    this.search.$fullListBtn.hide();
     this.$modalContainer.hide();
     this.fetchData(numOfEmployees);
   }
@@ -164,6 +167,32 @@ class Modal {
       this.populateModal(nextEmployee);
     }
   }
+}
+
+// -- SEARCH COMPONENT -- //
+
+class Search {
+  constructor(employees) {
+    this.employees = employees;
+    this.$fullListBtn = $('.full-list-btn');
+    this.$searchInput = $('#search-input');
+    this.$searchSubmitBtn = $('#search-submit');
+   
+    this.$searchSubmitBtn.on('click', () => this.searchSubmit());
+    this.$fullListBtn.on('click', () => this.returnFullList());
+  }
+
+  searchSubmit() {
+    this.$searchSubmitBtn.hide();
+    this.$fullListBtn.show();
+  }
+
+  returnFullList() {
+    this.$fullListBtn.hide(); 
+    this.$searchSubmitBtn.show();
+  }
+
+
 }
 
 /*=============-=============-=============-=============
