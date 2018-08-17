@@ -57,7 +57,6 @@ class Directory {
   constructor() {
     this.employees = [];
     this.$gallery = $('#gallery');
-    this.$cards = null;
     this.$modalContainer = $('.modal-container');
     this.modal = null;
     this.$searchInput = $('#search-input');
@@ -70,26 +69,23 @@ class Directory {
 
   init(numOfEmployees) {
     this.$modalContainer.hide();
+    this.$fullListBtn.hide();
     this.fetchData(numOfEmployees);
   }
 
   fetchData(num) {
     fetch(`https://randomuser.me/api/?nat=us,ca,au&results=${num}&noinfo`)
         .then(res => res.json())
-        .then(data => data.results)
-        .then(employeesData => {
-          return employeesData.map(employeeData => createEmployee(employeeData));
-        })
+        .then(data => data.results.map(employeeData => createEmployee(employeeData)))
         .then(employeesArray => {
-          employeesArray.map(employee => this.employees.push(employee));
+          employeesArray.forEach(employee => this.employees.push(employee));
           this.populateEmployees(this.employees);
-          this.$cards = $('.cards');
         });
   }
 
   populateEmployees(employees) {
     const html = employees.map(employee => {
-      const { name, email, image, city, state} = employee;
+      const { name, email, image, city } = employee;
       return `<div class="card">
                 <div class="card-img-container">
                     <img class="card-img" src=${image} alt="profile picture">
@@ -111,26 +107,28 @@ class Directory {
     if(value !== '') {
       const filteredList = filterList(this.employees, 'name', value);
       this.$searchInput.val('');
-      this.$searchInput.hide();
 
       if(!filteredList.length) {
-        this.$gallery.html('<h2>There are no employees that match that search criteria</h2>');
+        this.$gallery.html('<h2>There are no employees that match this search</h2>');
       } else {
         this.$gallery.html('');
         this.populateEmployees(filteredList);
       }
 
-      this.$submitBtn.hide();
-      this.$fullListBtn.removeClass('is-hidden');
+      this.toggleSearchButtons();
     }
   }
 
   returnToFullList() {
     this.$gallery.html('');
     this.populateEmployees(this.employees);
-    this.$searchInput.show();
-    this.$fullListBtn.addClass('is-hidden');
-    this.$submitBtn.show();
+    this.toggleSearchButtons();
+  }
+
+  toggleSearchButtons() {
+    this.$submitBtn.toggle();
+    this.$searchInput.toggle();
+    this.$fullListBtn.toggle();
   }
 }
 
@@ -144,7 +142,7 @@ class Modal {
     this.$modalCloseBtn = $('#modal-close-btn');
     this.$modalNavButtons = $('.modal-btn-container button');
     this.employees = employees;
-    this.currentEmployeeIndex = 0;
+    this.selectedEmployeeIndex = 0;
 
     this.$cards.on('click', e => this.showModal(e));
     this.$modalCloseBtn.on('click', () => this.hideModal());
@@ -153,9 +151,9 @@ class Modal {
 
   showModal(e) {
     const $selectedCard = $(e.target).closest('.card');
-    this.currentEmployeeIndex = $selectedCard.index();
-    const currentEmployee = this.employees[this.currentEmployeeIndex];
-    this.populateModal(currentEmployee);
+    this.selectedEmployeeIndex = $selectedCard.index();
+    const selectedEmployee = this.employees[this.selectedEmployeeIndex];
+    this.populateModal(selectedEmployee);
     this.$modal.show();
   }
 
@@ -182,20 +180,20 @@ class Modal {
     const lastIndex = this.employees.length - 1;
     
     if(e.target.textContent === 'Prev') {
-      if (this.currentEmployeeIndex === 0) {
-        this.currentEmployeeIndex = lastIndex;
+      if (this.selectedEmployeeIndex === 0) {
+        this.selectedEmployeeIndex = lastIndex;
       } else {
-        this.currentEmployeeIndex--;
+        this.selectedEmployeeIndex--;
       }
-      const prevEmployee = this.employees[this.currentEmployeeIndex];
+      const prevEmployee = this.employees[this.selectedEmployeeIndex];
       this.populateModal(prevEmployee);
     } else if(e.target.textContent === 'Next') {
-      if (this.currentEmployeeIndex === lastIndex) {
-        this.currentEmployeeIndex = 0;
+      if (this.selectedEmployeeIndex === lastIndex) {
+        this.selectedEmployeeIndex = 0;
       } else {
-        this.currentEmployeeIndex++;
+        this.selectedEmployeeIndex++;
       }
-      const nextEmployee = this.employees[this.currentEmployeeIndex];
+      const nextEmployee = this.employees[this.selectedEmployeeIndex];
       this.populateModal(nextEmployee);
     }
   }
