@@ -57,14 +57,15 @@ class Directory {
   constructor() {
     this.employees = [];
     this.$gallery = $('#gallery');
-    this.$cards = $('#gallery .card');
+    this.$cards = null;
     this.$modalContainer = $('.modal-container');
     this.modal = null;
     this.$searchInput = $('#search-input');
-    this.searchButtons = new SearchButtons();
+    this.$fullListBtn = $('.full-list-btn');
+    this.$submitBtn = $('#search-submit');
 
-    this.searchButtons.$submitBtn.on('click', () => this.performSearch());
-    this.searchButtons.$fullListBtn.on('click', () => this.returnFullList());
+    this.$submitBtn.on('click', () => this.performSearch());
+    this.$fullListBtn.on('click', () => this.returnToFullList());
   };
 
   init(numOfEmployees) {
@@ -80,10 +81,9 @@ class Directory {
           return employeesData.map(employeeData => createEmployee(employeeData));
         })
         .then(employeesArray => {
-          this.populateEmployees(employeesArray);
-          this.$cards = $('.cards');
           employeesArray.map(employee => this.employees.push(employee));
-          this.modal = new Modal(this.employees);
+          this.populateEmployees(this.employees);
+          this.$cards = $('.cards');
         });
   }
 
@@ -102,13 +102,14 @@ class Directory {
               </div>`;
     });
     this.$gallery.append(html);
+    this.modal = new Modal(employees);
   }
 
   performSearch() {
     const value = this.$searchInput.val().toLowerCase().trim();
-    const filteredList = filterList(this.employees, value);
 
     if(value !== '') {
+      const filteredList = filterList(this.employees, 'name', value);
       this.$searchInput.val('');
       this.$searchInput.hide();
 
@@ -117,19 +118,19 @@ class Directory {
       } else {
         this.$gallery.html('');
         this.populateEmployees(filteredList);
-        this.modal = new Modal(filteredList);
       }
-      
-      this.searchButtons.showFullListBtn();
+
+      this.$submitBtn.hide();
+      this.$fullListBtn.removeClass('is-hidden');
     }
   }
 
-  returnFullList() {
+  returnToFullList() {
     this.$gallery.html('');
     this.populateEmployees(this.employees);
-    this.modal = new Modal(this.employees);
     this.$searchInput.show();
-    this.searchButtons.showSubmitBtn();
+    this.$fullListBtn.addClass('is-hidden');
+    this.$submitBtn.show();
   }
 }
 
@@ -200,31 +201,12 @@ class Modal {
   }
 }
 
-// -- SEARCH COMPONENT -- //
-
-class SearchButtons {
-  constructor() {
-    this.$fullListBtn = $('.full-list-btn');
-    this.$submitBtn = $('#search-submit');
-  }
-
-  showSubmitBtn() {
-    this.$fullListBtn.addClass('is-hidden');
-    this.$submitBtn.show();
-  }
-
-  showFullListBtn() {
-    this.$submitBtn.hide();
-    this.$fullListBtn.removeClass('is-hidden');
-  }
-}
-
 /*=============-=============-=============-=============
                         FUNCTIONS
 ===============-=============-=============-===========*/
 
-function filterList(employees, value) {
-  return employees.filter(employee => employee.name.includes(value));
+function filterList(list, filterBy, value) {
+  return list.filter(list => list[filterBy].includes(value));
 }
 
 function formatDate(date) {
