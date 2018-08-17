@@ -27,8 +27,6 @@ $('.search-container').append(
     <input type="submit" value="&#x1F50D;" id="serach-submit" class="search-submit">
   </form>`);
 
-$('.modal-container').hide();
-
 /*=============-=============-=============-=============
                         COMPONENTS
 ===============-=============-=============-===========*/
@@ -59,8 +57,14 @@ class Directory {
     this.employees = [];
     this.$gallery = $('#gallery');
     this.$cards = $('#gallery .card');
+    this.$modalContainer = $('.modal-container');
     this.modal = null;
   };
+
+  init(numOfEmployees) {
+    this.$modalContainer.hide();
+    this.fetchData(numOfEmployees);
+  }
 
   fetchData(num) {
     fetch(`https://randomuser.me/api/?nat=us,ca,au&results=${num}&noinfo`)
@@ -291,5 +295,4 @@ function abbreviateState(state, countryCode) {
 ===============-=============-=============-===========*/
 
 const directory = new Directory();
-directory.fetchData(12);
-console.log(directory.employees)
+directory.init(12);
