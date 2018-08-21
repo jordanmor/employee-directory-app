@@ -66,13 +66,15 @@ class Directory {
     this.$submitBtn.on('click', () => this.performSearch());
     this.$fullListBtn.on('click', () => this.returnToFullList());
   };
-
+  // Init performs these actions when the page loads
   init(numOfEmployees) {
     this.$modalContainer.hide();
     this.$fullListBtn.hide();
     this.fetchData(numOfEmployees);
   }
-
+  /* Fetched data is mapped over and used to make an array of employees 
+     using the createEmployee component. This array of employees is stored 
+     in the Directory component and used to populate the employee cards in the DOM */
   fetchData(num) {
     fetch(`https://randomuser.me/api/?nat=us,ca,au&results=${num}&noinfo`)
         .then(res => res.json())
@@ -85,6 +87,7 @@ class Directory {
 
   populateEmployees(employees) {
     const html = employees.map(employee => {
+      // Use destructuring to pull relevant data from the employees array
       const { name, email, image, city } = employee;
       return `<div class="card">
                 <div class="card-img-container">
@@ -98,6 +101,9 @@ class Directory {
               </div>`;
     });
     this.$gallery.append(html);
+    /* A new instance of the Modal component is created every time the app populates 
+    the employee cards in the DOM. This assures that the modal will work 
+    with the list of employees if it is filtered. */
     this.modal = new Modal(employees);
   }
 
@@ -135,6 +141,8 @@ class Directory {
 // -- MODAL COMPONENT -- //
 
 class Modal {
+  /* Every time the Modal Component is instantiated, the main employee list 
+     is passed down to it from the Directory component */
   constructor(employees) {
     this.$modal = $('.modal-container');
     this.$body = $('body');
@@ -149,6 +157,9 @@ class Modal {
     this.$modalNavButtons.on('click', e => this.navigateModal(e));
   }
 
+  /* When user clicks an employee card, this method finds the index of that card 
+    relevant to the entire list of cards in the dom, and uses that index to find 
+    the same employee in the main employee array stored in the Directory component. */
   showModal(e) {
     const $selectedCard = $(e.target).closest('.card');
     this.selectedEmployeeIndex = $selectedCard.index();
@@ -176,10 +187,12 @@ class Modal {
     $('.modal-birthday').text(`Birthday: ${birthday}`);
   }
 
+  // Switch back and forth between employees when detail modal is open
   navigateModal(e) {
     const lastIndex = this.employees.length - 1;
     
     if(e.target.textContent === 'Prev') {
+      // If first employee in list is reached, moving back takes user to the last employee in the list
       if (this.selectedEmployeeIndex === 0) {
         this.selectedEmployeeIndex = lastIndex;
       } else {
@@ -188,6 +201,7 @@ class Modal {
       const prevEmployee = this.employees[this.selectedEmployeeIndex];
       this.populateModal(prevEmployee);
     } else if(e.target.textContent === 'Next') {
+      // If last employee in list is reached, moving forward takes user to the first employee in the list
       if (this.selectedEmployeeIndex === lastIndex) {
         this.selectedEmployeeIndex = 0;
       } else {
@@ -202,11 +216,11 @@ class Modal {
 /*=============-=============-=============-=============
                         FUNCTIONS
 ===============-=============-=============-===========*/
-
+// Function refactored so it can be used in other use cases as well
 function filterList(list, filterBy, value) {
   return list.filter(list => list[filterBy].includes(value));
 }
-
+// Function used to format birthday
 function formatDate(date) {
   const d = new Date(date);
   const year = d.getFullYear();
@@ -222,7 +236,8 @@ function formatDate(date) {
 function capitalize(str) {
   return str.split(' ').map( item => item.slice(0,1).toUpperCase() + item.substring(1)).join(' ');
 }
-
+/* The Random User Generator API only has country codes, 
+   so this function translates that code into the full country name */
 function unAbbreviateCountry(countryCode) {
   const countryAbbr = {
     AU: 'Australia',
@@ -232,7 +247,8 @@ function unAbbreviateCountry(countryCode) {
 
   return countryAbbr[countryCode];
 }
-
+/* The Random User Generator API only gives the full state name. The example in the project mockup 
+   uses an abbreviated state name, so this function serves that purpose */
 function abbreviateState(state, countryCode) {
 
   const statesAbbr = {
