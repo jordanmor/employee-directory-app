@@ -220,26 +220,30 @@ class Modal {
 
   // Switch back and forth between employees when detail modal is open
   navigateModal(e) {
-    const lastIndex = this.employees.length - 1;
-    
-    if(e.target.textContent === 'Prev') {
-      // If first employee in list is reached, moving back takes user to the last employee in the list
-      if (this.selectedEmployeeIndex === 0) {
-        this.selectedEmployeeIndex = lastIndex;
-      } else {
-        this.selectedEmployeeIndex--;
+    // Navigation buttons only work if there is more than 1 employee in the employee list
+    if(this.employees.length > 1) {
+      const lastIndex = this.employees.length - 1;
+
+      if(e.target.textContent === 'Prev') {
+        // If first employee in list is reached, moving back takes user to the last employee in the list
+        if (this.selectedEmployeeIndex === 0) {
+          this.selectedEmployeeIndex = lastIndex;
+        } else {
+          this.selectedEmployeeIndex--;
+        }
+        const prevEmployee = this.employees[this.selectedEmployeeIndex];
+        this.populateModal(prevEmployee);
+
+      } else if(e.target.textContent === 'Next') {
+        // If last employee in list is reached, moving forward takes user to the first employee in the list
+        if (this.selectedEmployeeIndex === lastIndex) {
+          this.selectedEmployeeIndex = 0;
+        } else {
+          this.selectedEmployeeIndex++;
+        }
+        const nextEmployee = this.employees[this.selectedEmployeeIndex];
+        this.populateModal(nextEmployee);
       }
-      const prevEmployee = this.employees[this.selectedEmployeeIndex];
-      this.populateModal(prevEmployee);
-    } else if(e.target.textContent === 'Next') {
-      // If last employee in list is reached, moving forward takes user to the first employee in the list
-      if (this.selectedEmployeeIndex === lastIndex) {
-        this.selectedEmployeeIndex = 0;
-      } else {
-        this.selectedEmployeeIndex++;
-      }
-      const nextEmployee = this.employees[this.selectedEmployeeIndex];
-      this.populateModal(nextEmployee);
     }
   }
 }
