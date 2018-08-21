@@ -63,8 +63,8 @@ class Directory {
     this.$fullListBtn = $('.full-list-btn');
     this.$submitBtn = $('#search-submit');
 
-    this.$submitBtn.on('click', () => this.performSearch());
-    this.$fullListBtn.on('click', () => this.returnToFullList());
+    this.$submitBtn.on('click', e => this.performSearch(e));
+    this.$fullListBtn.on('click', e => this.returnToFullList(e));
   };
   // Init performs these actions when the page loads
   init(numOfEmployees) {
@@ -107,7 +107,8 @@ class Directory {
     this.modal = new Modal(employees);
   }
 
-  performSearch() {
+  performSearch(e) {
+    e.preventDefault();
     const value = this.$searchInput.val().toLowerCase().trim();
 
     if(value !== '') {
@@ -125,7 +126,8 @@ class Directory {
     }
   }
 
-  returnToFullList() {
+  returnToFullList(e) {
+    e.preventDefault();
     this.$gallery.html('');
     this.populateEmployees(this.employees);
     this.toggleSearchButtons();
