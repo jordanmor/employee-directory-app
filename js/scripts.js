@@ -28,6 +28,8 @@ $('.search-container').append(
     <button class="full-list-btn is-hidden">Return to Full List</button>
   </form>`);
 
+$('.modal-container').after('<div class="loader"></div>');
+
 /*=============-=============-=============-=============
                         COMPONENTS
 ===============-=============-=============-===========*/
@@ -57,6 +59,8 @@ class Directory {
   constructor() {
     this.employees = [];
     this.$gallery = $('#gallery');
+    this.$directory = $('#directory');
+    this.$loader = $('.loader');
     this.$modalContainer = $('.modal-container');
     this.modal = null;
     this.$searchInput = $('#search-input');
@@ -69,6 +73,7 @@ class Directory {
   // Init performs these actions when the page loads
   init(numOfEmployees) {
     this.$modalContainer.hide();
+    this.$loader.hide();
     this.$fullListBtn.hide();
     this.fetchData(numOfEmployees);
   }
@@ -76,11 +81,13 @@ class Directory {
      using the createEmployee component. This array of employees is stored 
      in the Directory component and used to populate the employee cards in the DOM */
   fetchData(num) {
+    this.startLoader();
     fetch(`https://randomuser.me/api/?nat=us,ca,au&results=${num}&noinfo`)
         .then(res => res.json())
         .then(data => data.results.map(employeeData => createEmployee(employeeData)))
         .then(employeesArray => {
           employeesArray.forEach(employee => this.employees.push(employee));
+          this.endLoader();
           this.populateEmployees(this.employees);
         });
   }
@@ -138,6 +145,17 @@ class Directory {
     this.$searchInput.toggle();
     this.$fullListBtn.toggle();
   }
+
+  startLoader() {
+    this.$directory.fadeOut(0);
+    this.$loader.show();
+  }
+
+  endLoader() {
+    this.$loader.hide();
+    this.$directory.fadeIn(1000);
+  }
+
 }
 
 // -- MODAL COMPONENT -- //
