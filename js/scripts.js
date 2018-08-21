@@ -108,6 +108,11 @@ class Directory {
               </div>`;
     });
     this.$gallery.append(html);
+
+    /* Old event listeners from the previous instance of the modal component 
+    have to be removed before creating a new instance of the modal to avoid duplicates*/
+    this.removeEventHandlers();
+
     /* A new instance of the Modal component is created every time the app populates 
     the employee cards in the DOM. This assures that the modal will work 
     with the list of employees if it is filtered. */
@@ -154,6 +159,12 @@ class Directory {
   endLoader() {
     this.$loader.hide();
     this.$directory.fadeIn(1000);
+  }
+
+  removeEventHandlers() {
+    $('.card').off();
+    $('#modal-close-btn').off();
+    $('.modal-btn-container button').off();
   }
 
 }
