@@ -70,6 +70,7 @@ class Directory {
     this.$submitBtn.on('click', e => this.performSearch(e));
     this.$fullListBtn.on('click', e => this.returnToFullList(e));
   };
+
   // Init performs these actions when the page loads
   init(numOfEmployees) {
     this.$modalContainer.hide();
@@ -77,9 +78,10 @@ class Directory {
     this.$fullListBtn.hide();
     this.fetchData(numOfEmployees);
   }
+
   /* Fetched data is mapped over and used to make an array of employees 
-     using the createEmployee component. This array of employees is stored 
-     in the Directory component and used to populate the employee cards in the DOM */
+  using the createEmployee component. This array of employees is stored 
+  in the Directory component and used to populate the employee cards in the DOM */
   fetchData(num) {
     this.startLoader();
     fetch(`https://randomuser.me/api/?nat=us,ca,au&results=${num}&noinfo`)
@@ -251,10 +253,12 @@ class Modal {
 /*=============-=============-=============-=============
                         FUNCTIONS
 ===============-=============-=============-===========*/
+
 // Function refactored so it can be used in other use cases as well
 function filterList(list, filterBy, value) {
   return list.filter(list => list[filterBy].includes(value));
 }
+
 // Function used to format birthday
 function formatDate(date) {
   const d = new Date(date);
@@ -271,6 +275,7 @@ function formatDate(date) {
 function capitalize(str) {
   return str.split(' ').map( item => item.slice(0,1).toUpperCase() + item.substring(1)).join(' ');
 }
+
 /* The Random User Generator API only has country codes, 
    so this function translates that code into the full country name */
 function unAbbreviateCountry(countryCode) {
@@ -282,6 +287,7 @@ function unAbbreviateCountry(countryCode) {
 
   return countryAbbr[countryCode];
 }
+
 /* The Random User Generator API only gives the full state name. The example in the project mockup 
    uses an abbreviated state name, so this function serves that purpose */
 function abbreviateState(state, countryCode) {
