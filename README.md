@@ -11,6 +11,7 @@ Treehouse Full Stack JavaScript Techdegree - Project 5
   - Other than JS or jQuery, do not use any other frameworks, libraries or plugins to create 
     the necessary functionality for this project.
 
-**Note to Reviewer concerning Extra Credit:** 
+**Project Completed:** 08/24/2018  
+**Grade:** Exceeds Expectations
 
-I have added a box shadow to the employee card divs.
+**View Project:** https://jordanmor.github.io/employee-directory-app/
