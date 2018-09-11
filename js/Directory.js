@@ -1,24 +1,22 @@
 class Directory {
   constructor() {
     this.employees = [];
-    this.$gallery = $('#gallery');
-    this.$directory = $('#directory');
-    this.$loader = $('.loader');
-    this.$modalContainer = $('.modal-container');
     this.modal = null;
-    this.$searchInput = $('#search-input');
-    this.$fullListBtn = $('.full-list-btn');
-    this.$submitBtn = $('#search-submit');
-
-    this.$submitBtn.on('click', e => this.performSearch(e));
-    this.$fullListBtn.on('click', e => this.returnToFullList(e));
+    this.DOM = {
+      directory: $('#directory'),
+      gallery: $('#gallery'),
+      searchInput: $('#search-input'),
+      fullListBtn:  $('.full-list-btn'),
+      submitBtn: $('#search-submit'),
+      loader: $('.loader')
+    };
   };
 
   // Init performs these actions when the page loads
   init(numOfEmployees) {
-    this.$modalContainer.hide();
-    this.$loader.hide();
-    this.$fullListBtn.hide();
+    $('.modal-container').hide();
+    this.DOM.loader.hide();
+    this.DOM.fullListBtn.hide();
     this.fetchData(numOfEmployees);
   }
 
@@ -52,11 +50,7 @@ class Directory {
                 </div>
               </div>`;
     });
-    this.$gallery.append(html);
-
-    /* Old event listeners from the previous instance of the modal component 
-    have to be removed before creating a new instance of the modal to avoid duplicates*/
-    this.removeEventHandlers();
+    this.DOM.gallery.append(html);
 
     /* A new instance of the Modal component is created every time the app populates 
     the employee cards in the DOM. This assures that the modal will work 
@@ -66,16 +60,16 @@ class Directory {
 
   performSearch(e) {
     e.preventDefault();
-    const value = this.$searchInput.val().toLowerCase().trim();
+    const value = this.DOM.searchInput.val().toLowerCase().trim();
 
     if(value !== '') {
       const filteredList = filterList(this.employees, 'name', value);
-      this.$searchInput.val('');
+      this.DOM.searchInput.val('');
 
       if(!filteredList.length) {
-        this.$gallery.html('<h2>There are no employees that match this search</h2>');
+        this.DOM.gallery.html('<h2>There are no employees that match this search</h2>');
       } else {
-        this.$gallery.html('');
+        this.DOM.gallery.html('');
         this.populateEmployees(filteredList);
       }
 
@@ -85,31 +79,24 @@ class Directory {
 
   returnToFullList(e) {
     e.preventDefault();
-    this.$gallery.html('');
+    this.DOM.gallery.html('');
     this.populateEmployees(this.employees);
     this.toggleSearchButtons();
   }
 
   toggleSearchButtons() {
-    this.$submitBtn.toggle();
-    this.$searchInput.toggle();
-    this.$fullListBtn.toggle();
+    this.DOM.submitBtn.toggle();
+    this.DOM.searchInput.toggle();
+    this.DOM.fullListBtn.toggle();
   }
 
   startLoader() {
-    this.$directory.fadeOut(0);
-    this.$loader.show();
+    this.DOM.directory.fadeOut(0);
+    this.DOM.loader.show();
   }
 
   endLoader() {
-    this.$loader.hide();
-    this.$directory.fadeIn(1000);
+    this.DOM.loader.hide();
+    this.DOM.directory.fadeIn(1000);
   }
-
-  removeEventHandlers() {
-    $('.card').off();
-    $('#modal-close-btn').off();
-    $('.modal-btn-container button').off();
-  }
-
 }
