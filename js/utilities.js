@@ -1,7 +1,3 @@
-function filterList(list, filterBy, value) {
-  return list.filter(list => list[filterBy].includes(value));
-}
-
 // Format birthday
 function formatDate(date) {
   const d = new Date(date);

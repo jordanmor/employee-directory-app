@@ -63,7 +63,7 @@ class Directory {
     const value = this.DOM.searchInput.val().toLowerCase().trim();
 
     if(value !== '') {
-      const filteredList = filterList(this.employees, 'name', value);
+      const filteredList = this.filterList(this.employees, value);
       this.DOM.searchInput.val('');
 
       if(!filteredList.length) {
@@ -75,6 +75,10 @@ class Directory {
 
       this.toggleSearchButtons();
     }
+  }
+
+  filterList(list, value) {
+    return list.filter(list => list.name.includes(value));
   }
 
   returnToFullList(e) {
